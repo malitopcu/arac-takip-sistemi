@@ -58,9 +58,8 @@ Teker Teker Komponentler
 1 adet 10µF ve 1 adet 100µF Elektrolitik Kapasitör (Kutuplu):                  40TL
 1 adet NEO-M8N GPS Modülü						800TL
 1 adet Aktif GPS Anteni						300TL
-1 adet DS18B20 Sıcaklık Sensörü					80 TL
 1 adet 4.7kΩ Direnç (THT):
 Header 3 tane								60TL
 
 
-Toplam 								1360 TL
+Toplam 								1280 TL
