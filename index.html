@@ -82,23 +82,34 @@
     });
 
     // 3. Veri Geldiğinde Arayüzü Güncelle
+    // 3. Veri Geldiğinde Arayüzü Güncelle
     client.on('message', (topic, message) => {
       const data = JSON.parse(message.toString());
-      const latLng = [data.lat, data.lng];
 
-      // Değerleri güncelle
-      document.getElementById("val-speed").textContent = `${data.speed} km/h`;
-      document.getElementById("val-temp").textContent = `${data.temp} °C`;
-      document.getElementById("val-coords").textContent = `${data.lat}, ${data.lng}`;
+      // Hem Türkçe hem İngilizce anahtarları destekle (Hata önleyici)
+      const enlem = data.enlem ?? data.lat;
+      const boylam = data.boylam ?? data.lng;
+      const hiz = data.hız ?? data.hiz ?? data.speed ?? 0;
+      const sicaklik = data.ısı ?? data.sicaklik ?? data.temp ?? 0;
 
-      // Harita üzerindeki aracı ve mavi iz çizgisini güncelle
-      if (!vehicleMarker) {
-        vehicleMarker = L.marker(latLng).addTo(map);
-      } else {
-        vehicleMarker.setLatLng(latLng);
+      // Eğer koordinatlar geçerliyse haritayı güncelle
+      if (enlem !== undefined && boylam !== undefined) {
+        const latLng = [enlem, boylam];
+
+        // Değerleri ekrana yaz
+        document.getElementById("val-speed").textContent = `${hiz} km/h`;
+        document.getElementById("val-temp").textContent = `${sicaklik} °C`;
+        document.getElementById("val-coords").textContent = `${enlem}, ${boylam}`;
+
+        // Haritada aracı ve rotayı çiz
+        if (!vehicleMarker) {
+          vehicleMarker = L.marker(latLng).addTo(map);
+        } else {
+          vehicleMarker.setLatLng(latLng);
+        }
+        pathHistory.addLatLng(latLng);
+        map.panTo(latLng);
       }
-      pathHistory.addLatLng(latLng);
-      map.panTo(latLng);
     });
   </script>
 </body>
