@@ -1,0 +1,66 @@
+1)Komponent araştırması, bilgisyaar arayüz programının araştırması, sistem maliyet araştırması ve tedarik araştırması, genel hatlarıyla kartın ortaya çıkarılması,
+
+Bu hafta yaptığım raporda Esp-32 Wrom modülünü kullanacağımıza göre arraştırma yaptım. 
+
+Araştırılması Gereken Konular
+
+THT Eleman Kullanmak mcu için sorun olur mu? Kuplaj kapasitörleri?
+ESP32-WROOM modülünün güç (3V3) pinlerine olabildiğince yakın yerleştirilmesi gereken dekuplaj kapasitörlerinde THT (delik içi) eleman kullanmaktan kaçınmalısınız.
+Neden? THT elemanların bacakları (lead) parazitik indüktans yaratır. ESP32, Wi-Fi verisi gönderirken anlık (RF burst) çok hızlı akım çeker. THT kapasitörler bu yüksek frekanslı akım dalgalanmalarına yeterince hızlı yanıt veremez ve mikrodenetleyicinin resetlenmesine (Brownout) sebep olur.
+Çözümü
+•  Kapasitör İkilisi (100nF + 100µF): ESP32'nin 3.3V ve GND pinleri arasına birbirine paralel iki farklı THT kapasitör bağlayın.
+•	Yüksek frekanslı gürültüleri filtrelemek için bir adet 100nF seramik (mercimek) kapasitör.
+•	Wi-Fi iletimi sırasında anlık akım ihtiyacını karşılayıp voltaj çökmesini (brownout) engellemek için bir adet 100µF (veya 47µF) elektrolitik kapasitör.
+•  Fiziksel Yakınlık ve Bacak Boyu: THT kapasitörleri Altium veya kullandığınız tasarım programında ESP32'nin güç pinlerine olabildiğince yakın yerleştirin. Montaj (lehimleme) aşamasında da kapasitörlerin bacaklarını mümkün olan en kısa seviyede keserek lehimleyin. Bacaklar uzadıkça sinyali bozan parazitik etki artar.
+•  Güç Yollarını Kalın Çizin: Regülatörden (LDO) çıkıp ESP32'ye ve bu kapasitörlere giden güç hatlarını (trace) PCB üzerinde en az 1-1.5 mm kalınlığında çizin.
+•  GND Poligonu: PCB'nin boş kalan tüm alanlarını (hem alt hem üst katman) GND (Toprak) yüzeyi ile kaplayarak (polygon pour) akımın dönüş yolunu pürüzsüz hale getirin.
+
+ESP32-WROOM geliştirme kartını ve modül kullanırsak PCB için Güç dağıtımı nasıl olur?
+LoRa (Long Range - Uzun Mesafe), adından da anlaşılacağı gibi kilometrelerce öteye veri taşıyabilen bir teknolojidir. Menzili, bulunduğunuz ortama ve kullandığınız antene göre büyük değişiklik gösterir:
+•	Şehir İçi (Binalar ve Engeller): Genellikle 2.000 ile 5.000 metre (2-5 km) arası. Betonarme yapılar, ağaçlar ve diğer frekans kirlilikleri menzili düşürür.
+•	Açık Alan / Kırsal (Görüş Hattı - Line of Sight): Engellerin olmadığı düzlüklerde 10.000 ile 15.000 metre (10-15 km) arası.
+•	İdeal Koşullar (Yüksek Kule Kurulumu): Alıcı cihazı (Gateway) yüksek bir tepeye veya çatıya yerleştirip kaliteli bir yönlü anten kullanırsanız, bu mesafe 20.000 metre (20 km) ve üzerine çıkabilir
+•	Evet ama lora betonarme yapılar için sınıfta kalıyor hotspot kullanarak yapmayı düşünüyorum 3 kişiyiz 1 miz dışarı çıkacak ve kendi internetini bağlicak tercihen android tabi  ve kendi internet adresini espye gireceğiz esp ile haberleşecek internetle beraber sınıfta projeksiyon a yansıtacağız
+
+A)Komponent araştırılması
+
+
+1. Güç Katı (Powerbank 5V -> Kart 3.3V)
+Powerbank'ten gelen 5V'u, ESP32'nin ihtiyaç duyduğu 3.3V'a güvenle düşürmek ve Wi-Fi'nin anlık akım çekimlerini (dalgalanmaları) filtrelemek için:
+•	1 adet THT USB Soketi: Micro-USB veya Type-C dip soket (PCB'ye doğrudan güç vermek için).
+•	1 adet LD33V (veya LM317 / LF33CV): 3.3V Voltaj Regülatörü. TO-220 kılıflıdır, tamamen THT kuralına uygundur ve 800mA - 1A'e kadar akım verebilir.
+•	2 adet 100nF Seramik Kapasitör (Mercimek): Regülatörün giriş ve çıkış bacaklarına paralel bağlanır. Yüksek frekanslı elektriksel gürültüleri temizler.
+•	1 adet 10µF ve 1 adet 100µF Elektrolitik Kapasitör (Kutuplu): Biri regülatör girişine, diğeri çıkışına (ESP32'ye yakın) takılır. ESP32 Wi-Fi'ye bağlanırken anlık akım çektiğinde voltajın çökmesini (cihazın resetlenmesini) engeller.
+2. Mikrodenetleyici (Kontrol Katı)
+•	1 adet ESP32 Geliştirme Kartı (30 veya 38 Pin NodeMCU tarzı):
+o	Önemli Not: Çıplak ESP32-WROOM modülünün kendisi SMD (yüzey montaj) bir elemandır. Hocanız SMD istemiyorsa, en profesyonel ve kurallara uygun yöntem çıplak modül kullanmak yerine hazır bir ESP32 geliştirme kartını, PCB'nize lehimleyeceğiniz dişi header'lara (yuvalara) oturtmaktır. Böylece kartı THT olarak tasarlamış olursunuz.
+3. Konum Katı (GPS)
+•	1 adet NEO-M8N GPS Modülü: Üzerinde standart THT pin delikleriyle gelir. NEO-6M'e göre daha hızlı uydulara bağlanır (GLONASS desteği vardır).
+•	1 adet Aktif GPS Anteni: Modülün üzerindeki küçük IPEX/SMA soketine takılır. Konumun saniyeler içinde bulunmasını sağlar.
+4. Sıcaklık Katı
+•	1 adet DS18B20 Sıcaklık Sensörü: TO-92 kılıf (transistör görünümünde) tamamen THT bacaklı bir elemandır. (İsterseniz kablolu, su geçirmez metal uçlu versiyonunu da kullanabilirsiniz).
+•	1 adet 4.7kΩ Direnç (THT): Bu çok kritiktir. DS18B20 sensörü "1-Wire" protokolüyle çalışır. Sensörün Data bacağı ile 3.3V (VDD) bacağı arasına bu direnci "Pull-Up" olarak bağlamazsanız ESP32 sıcaklık verisini okuyamaz.
+5. Durum Göstergeleri (Şov ve Debug İçin)
+Hocaya sunum yaparken kartın üzerinde yanıp sönen ışıklar projenin çalıştığını gösterir ve çok profesyonel durur:
+•	3 adet 5mm veya 3mm LED (THT):
+o	Kırmızı LED: Cihaza elektrik geldiğini gösterir (Güç hattına bağlanır).
+o	Mavi LED: İnternete (Hotspot) bağlandığını gösterir (ESP32 pinine).
+o	Yeşil LED: GPS uydularına kilitlendiğini ve veri gönderdiğini gösterir (ESP32 pinine).
+•	3 adet 330Ω veya 220Ω Direnç (THT): LED'lerin patlamaması için önlerine seri bağlanır.
+6. Mekanik ve Bağlantı
+•	Dişi Header (Pin Yuvası): Modülleri (ESP32 ve GPS'i) doğrudan PCB'ye lehimlemeyin. Çok ısınırlarsa yanabilirler. PCB'ye dişi header'ları lehimleyin, ESP32 ve GPS modülünü bu yuvalara takıp çıkarılabilir şekilde kurgulayın.
+•	Vidalı Klemens (THT - Opsiyonel): Sıcaklık sensörünü kablolu alacaksanız, kabloları karta kolayca vidalamak için 3'lü klemens koyabilirsiniz.
+
+
+Teker Teker Komponentler
+1 adet LD33V  								40TL
+2 adet 100nF Seramik Kapasitör					40TL
+1 adet 10µF ve 1 adet 100µF Elektrolitik Kapasitör (Kutuplu):                  40TL
+1 adet NEO-M8N GPS Modülü						800TL
+1 adet Aktif GPS Anteni						300TL
+1 adet DS18B20 Sıcaklık Sensörü					80 TL
+1 adet 4.7kΩ Direnç (THT):
+Header 3 tane								60TL
+
+
+Toplam 								1360 TL
