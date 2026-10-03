@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Canlı Araç Takip Paneli</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <style>
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; display: flex; height: 100vh; background: #121214; }
+    #sidebar { width: 320px; background: #1a1a1e; color: #fff; padding: 24px; box-sizing: border-box; display: flex; flex-direction: column; gap: 16px; border-right: 1px solid #2d2d34; }
+    #map { flex: 1; height: 100%; }
+    .card { background: #26262b; border-radius: 8px; padding: 14px; border: 1px solid #33333d; }
+    .label { font-size: 12px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
+    .value { font-size: 22px; font-weight: 600; margin-top: 6px; color: #38bdf8; }
+    .status-badge { display: inline-block; padding: 6px 12px; border-radius: 6px; font-size: 13px; font-weight: 500; }
+    .status-online { background: #064e3b; color: #6ee7b7; border: 1px solid #059669; }
+    .status-offline { background: #450a0a; color: #fca5a5; border: 1px solid #dc2626; }
+  </style>
+</head>
+<body>
+
+  <div id="sidebar">
+    <h2 style="margin: 0; font-size: 20px;">Araç Telemetrisi</h2>
+
+    <div class="card">
+      <div class="label">Bağlantı Durumu</div>
+      <div id="conn-status" class="status-badge status-offline" style="margin-top: 8px;">Bağlantı Bekleniyor</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Anlık Hız</div>
+      <div class="value" id="val-speed">- km/h</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Kabin / Motor Sıcaklığı</div>
+      <div class="value" id="val-temp" style="color: #f59e0b;">- °C</div>
+    </div>
+
+    <div class="card">
+      <div class="label">Koordinatlar</div>
+      <div style="font-size: 13px; color: #d1d5db; margin-top: 6px; font-family: monospace;" id="val-coords">-</div>
+    </div>
+  </div>
+
+  <div id="map"></div>
+
+  <!-- Harita ve MQTT Kütüphaneleri -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
+
+  <script>
+    // 1. Haritayı Başlat (Konya)
+    const map = L.map('map').setView([37.8714, 32.4846], 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    let vehicleMarker = null;
+    let pathHistory = L.polyline([], { color: '#0284c7', weight: 4 }).addTo(map);
+
+    // 2. MQTT Bağlantısı (WebSocket üzerinden)
+    const BROKER_URL = "wss://broker.emqx.io:8084/mqtt";
+    const TOPIC = "proje_arac_takip/arac_01/telemetri";
+
+    const client = mqtt.connect(BROKER_URL);
+
+    client.on('connect', () => {
+      const el = document.getElementById("conn-status");
+      el.textContent = "Canlı İzleniyor";
+      el.className = "status-badge status-online";
+
+      client.subscribe(TOPIC, (err) => {
+        if (!err) console.log("Abone olundu:", TOPIC);
+      });
+    });
+
+    client.on('offline', () => {
+      const el = document.getElementById("conn-status");
+      el.textContent = "Bağlantı Kesildi";
+      el.className = "status-badge status-offline";
+    });
+
+    // 3. Veri Geldiğinde Arayüzü Güncelle
+    // 3. Veri Geldiğinde Arayüzü Güncelle
+    client.on('message', (topic, message) => {
+      const data = JSON.parse(message.toString());
+
+      // Hem Türkçe hem İngilizce anahtarları destekle (Hata önleyici)
+      const enlem = data.enlem ?? data.lat;
+      const boylam = data.boylam ?? data.lng;
+      const hiz = data.hız ?? data.hiz ?? data.speed ?? 0;
+      const sicaklik = data.ısı ?? data.sicaklik ?? data.temp ?? 0;
+
+      // Eğer koordinatlar geçerliyse haritayı güncelle
+      if (enlem !== undefined && boylam !== undefined) {
+        const latLng = [enlem, boylam];
+
+        // Değerleri ekrana yaz
+        document.getElementById("val-speed").textContent = `${hiz} km/h`;
+        document.getElementById("val-temp").textContent = `${sicaklik} °C`;
+        document.getElementById("val-coords").textContent = `${enlem}, ${boylam}`;
+
+        // Haritada aracı ve rotayı çiz
+        if (!vehicleMarker) {
+          vehicleMarker = L.marker(latLng).addTo(map);
+        } else {
+          vehicleMarker.setLatLng(latLng);
+        }
+        pathHistory.addLatLng(latLng);
+        map.panTo(latLng);
+      }
+    });
+  </script>
+</body>
+</html>
