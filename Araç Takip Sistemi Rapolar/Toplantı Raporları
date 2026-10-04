@@ -1,0 +1,17 @@
+4.10.2026 TOPLANTI NOTLARI
+Sıcaklık sensörü ve GPS Modülü belirlendi.(TMP1075DR/UBLOX NEO8M M8N)
+Test Kodları Python ile yazıldı. HTML ile WEB arayüz oluşturuldu.
+GitHub Kullanım düzeni kararlaştırıldı.
+PCB TASARIM BÖLGELERİ AŞAĞIDAKİ GİBİ BELİRLENDİ
+ARHAN:Regülatör ve GPS Modülü
+SAMİ: Sıcaklık Sensörü
+MUHAMMED: Güncellenen tasarım dosyalarından hata ayıklayacak. Sistemi test edecek.
+NOT: Yapılan tasarımlar GitHub' daki pcb klasörünün altına şu şekilde atılacak:
+pcb>SAMİ/ARHAN>tarihli klasör> tasarım kılavuzu+şematik dosyası+pcb dosyası
+
+NOT: Tasarım sürecinde seçilen komponentler kılavuzda çok net bir şekilde belirtilecek ve tasarım mantığı detaylıca görseller ile açıklanacak.
+
+10.10.2026 tarihinde yapılacak toplantıda konuşulacaklar:
+1- Yapılan şematik çizimler karşılaştırılacak.
+2- Gelecek tasarımlar konusunda tartışma
+3- Süreç analizi
