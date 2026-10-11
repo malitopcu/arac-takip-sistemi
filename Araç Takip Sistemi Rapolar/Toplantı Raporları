@@ -15,3 +15,8 @@ NOT: Tasarım sürecinde seçilen komponentler kılavuzda çok net bir şekilde 
 1- Yapılan şematik çizimler karşılaştırılacak.
 2- Gelecek tasarımlar konusunda tartışma
 3- Süreç analizi
+
+11.10.2026 TOPLANTI NOTLARI
+---Proteusta TPS5420DR entegresi, ESP32, TMP1075 entegresini ve GPS Modülünü proteus simülasyonunda nasıl çalıştırabiliriz?
+---Yapılan devrelerin hata kontrolünü yapılacak.
+---Yukarıdaki modüller ve entegreler için üretici firmanın SPICE dosyaları olup olmadığını ve proteusa aktarılabileceğini araştır.
