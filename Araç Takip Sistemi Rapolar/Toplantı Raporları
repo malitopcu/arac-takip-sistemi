@@ -1,4 +1,5 @@
 4.10.2026 TOPLANTI NOTLARI
+
 Sıcaklık sensörü ve GPS Modülü belirlendi.(TMP1075DR/UBLOX NEO8M M8N)
 Test Kodları Python ile yazıldı. HTML ile WEB arayüz oluşturuldu.
 GitHub Kullanım düzeni kararlaştırıldı.
@@ -17,6 +18,15 @@ NOT: Tasarım sürecinde seçilen komponentler kılavuzda çok net bir şekilde 
 3- Süreç analizi
 
 11.10.2026 TOPLANTI NOTLARI
+
 ---Proteusta TPS5420DR entegresi, ESP32, TMP1075 entegresini ve GPS Modülünü proteus simülasyonunda nasıl çalıştırabiliriz?
 ---Yapılan devrelerin hata kontrolünü yapılacak.
 ---Yukarıdaki modüller ve entegreler için üretici firmanın SPICE dosyaları olup olmadığını ve proteusa aktarılabileceğini araştır.
+
+18.10.2026 TOPLANTI NOTLARI
+
+--- 21.10.2026 tarihinde yapılacak olan sunum için kararlar alındı.
+--- Tasarım hataları gözden geçirildi. Yeni düzenlemeler için karar verildi.
+--- Farklı proteus tasarım dosyalarının tek bir dosyada bireştirme kararı alındı.
+
+NOT: BİRDAHAKİ TOPLANTIDA PCB TASARIMINA BAŞLANACAK. TOPLANTI VİZE SINAVLARINDAN SONRA YAPILACAK.
